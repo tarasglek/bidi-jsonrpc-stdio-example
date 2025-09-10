@@ -22,6 +22,8 @@ func (s *Server) hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.R
 
 		message := fmt.Sprintf("hello from go, server/version: %s", version)
 		return message, nil
+	case "bye":
+		return "good bye", nil
 	default:
 		return nil, &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: fmt.Sprintf("method not supported: %s", req.Method)}
 	}
