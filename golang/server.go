@@ -12,7 +12,7 @@ import (
 
 func rpc(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
-	case "hello": // rename this to bidi-hello  AI!
+	case "bidi-hello":
 		var version string
 		if err := conn.Call(ctx, "server/version", nil, &version); err != nil {
 			log.Printf("golang: failed to call client for version: %v", err)

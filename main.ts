@@ -11,8 +11,8 @@ const connection = rpc.createMessageConnection(
 );
 connection.listen();
 // ---- Client-side logic ----
-// Send "hello" to server
-connection.sendRequest("hello", { processId: process.pid }).then(async (result) => {
+// Send "bidi-hello" to server
+connection.sendRequest("bidi-hello", { processId: process.pid }).then(async (result) => {
   console.log("node: Server says:", result);
   const byeResult = await connection.sendRequest("bye");
   console.log("node: Server says:", byeResult);
