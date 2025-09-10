@@ -1,22 +1,11 @@
-import { spawn } from "child_process";
-
-import {
-
-  createMessageConnection,
-
-  StreamMessageReader,
-
-  StreamMessageWriter,
-
-  RequestType,
-
-} from "vscode-jsonrpc";
+import * as cp from "child_process";
+import * as rpc from "vscode-jsonrpc/node";
 
 
 
 // Launch the Go server process
 
-const server = spawn("./golang/goserver", [], {
+const server = cp.spawn("./golang/goserver", [], {
 
   stdio: ["pipe", "pipe", "inherit"], // stdin, stdout, stderr
 
@@ -26,11 +15,11 @@ const server = spawn("./golang/goserver", [], {
 
 // Setup JSON-RPC connection over stdio
 
-const connection = createMessageConnection(
+const connection = rpc.createMessageConnection(
 
-  new StreamMessageReader(server.stdout),
+  new rpc.StreamMessageReader(server.stdout),
 
-  new StreamMessageWriter(server.stdin)
+  new rpc.StreamMessageWriter(server.stdin)
 
 );
 
@@ -62,7 +51,7 @@ interface InitializeResult {
 
 
 
-const InitializeRequest = new RequestType<InitializeParams, InitializeResult, void>(
+const InitializeRequest = new rpc.RequestType<InitializeParams, InitializeResult, void>(
 
   "initialize"
 
@@ -90,7 +79,7 @@ interface ShowMessageResult {
 
 
 
-const ShowMessageRequest = new RequestType<
+const ShowMessageRequest = new rpc.RequestType<
 
   ShowMessageParams,
 
