@@ -9,7 +9,7 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-func hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
+func rpc(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
 	case "hello":
 		var version string
@@ -26,7 +26,6 @@ func hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (res
 		return nil, &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: fmt.Sprintf("method not supported: %s", req.Method)}
 	}
 }
-
 
 type stdrwc struct{}
 
@@ -47,6 +46,6 @@ func (stdrwc) Close() error {
 
 func main() {
 	stream := jsonrpc2.NewBufferedStream(new(stdrwc), jsonrpc2.VSCodeObjectCodec{})
-	conn := jsonrpc2.NewConn(context.Background(), stream, jsonrpc2.AsyncHandler(jsonrpc2.HandlerWithError(hello)))
+	conn := jsonrpc2.NewConn(context.Background(), stream, jsonrpc2.AsyncHandler(jsonrpc2.HandlerWithError(rpc)))
 	<-conn.DisconnectNotify()
 }
