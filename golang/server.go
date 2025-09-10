@@ -12,16 +12,16 @@ import (
 
 func rpc(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
-	case "bidi-hello":
+	case "server/bidi-hello":
 		var version string
-		if err := conn.Call(ctx, "server/version", nil, &version); err != nil {
+		if err := conn.Call(ctx, "client/version", nil, &version); err != nil {
 			log.Printf("golang: failed to call client for version: %v", err)
 			return nil, err
 		}
 
-		message := fmt.Sprintf("hello from go, server/version: %s", version)
+		message := fmt.Sprintf("hello from go, client/version: %s", version)
 		return message, nil
-	case "bye":
+	case "server/bye":
 		return "good bye", nil
 	default:
 		return nil, &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: fmt.Sprintf("method not supported: %s", req.Method)}
