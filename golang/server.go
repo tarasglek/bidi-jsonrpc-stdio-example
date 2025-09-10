@@ -12,7 +12,7 @@ import (
 
 func rpc(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
-	case "hello":
+	case "hello": // rename this to bidi-hello  AI!
 		var version string
 		if err := conn.Call(ctx, "server/version", nil, &version); err != nil {
 			log.Printf("golang: failed to call client for version: %v", err)
@@ -27,7 +27,6 @@ func rpc(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (resul
 		return nil, &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: fmt.Sprintf("method not supported: %s", req.Method)}
 	}
 }
-
 
 func main() {
 	stdio := struct {
