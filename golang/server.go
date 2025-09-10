@@ -1,7 +1,5 @@
 package main
 
-
-
 import (
 	"context"
 	"fmt"
@@ -11,15 +9,11 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-
-
 type Server struct{}
-
-
 
 func (s *Server) hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
-	case "initialize":
+	case "initialize": // rename this to  hello AI!
 		// Call back into client
 		go func() {
 			var result map[string]interface{}
@@ -64,4 +58,3 @@ func main() {
 	conn := jsonrpc2.NewConn(context.Background(), stream, jsonrpc2.HandlerWithError(handler.hello))
 	<-conn.DisconnectNotify()
 }
-
