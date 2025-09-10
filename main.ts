@@ -16,7 +16,7 @@ import {
 
 // Launch the Go server process
 
-const server = spawn("go", ["run", "server.go"], {
+const server = spawn("./golang/goserver", [], {
 
   stdio: ["pipe", "pipe", "inherit"], // stdin, stdout, stderr
 
