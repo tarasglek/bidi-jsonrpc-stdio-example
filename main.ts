@@ -11,15 +11,15 @@ const connection = rpc.createMessageConnection(
 );
 connection.listen();
 // ---- Define request types ----
-// Example: "initialize" request (client → server)
-interface InitializeParams {
+// Example: "hello" request (client → server)
+interface HelloParams {
   processId: number;
 }
-interface InitializeResult {
+interface HelloResult {
   capabilities: Record<string, unknown>;
 }
-const InitializeRequest = new rpc.RequestType<InitializeParams, InitializeResult, void>(
-  "initialize"
+const HelloRequest = new rpc.RequestType<HelloParams, HelloResult, void>(
+  "hello"
 );
 // Example: "window/showMessage" request (server → client)
 interface ShowMessageParams {
@@ -35,11 +35,11 @@ const ShowMessageRequest = new rpc.RequestType<
   void
 >("window/showMessage");
 // ---- Client-side logic ----
-// Send "initialize" to server
+// Send "hello" to server
 connection
-  .sendRequest(InitializeRequest, { processId: process.pid })
+  .sendRequest(HelloRequest, { processId: process.pid })
   .then((result) => {
-    console.log("Server initialized:", result);
+    console.log("Server says hello:", result);
   });
 // Handle "window/showMessage" coming from server
 connection.onRequest(ShowMessageRequest, async (params) => {

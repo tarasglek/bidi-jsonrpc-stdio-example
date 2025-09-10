@@ -13,7 +13,7 @@ type Server struct{}
 
 func (s *Server) hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
-	case "initialize": // rename this to  hello AI!
+	case "hello":
 		// Call back into client
 		go func() {
 			var result map[string]interface{}
