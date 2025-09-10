@@ -25,29 +25,42 @@ impl LanguageServer for Backend {
     }
 }
 
-enum ClientVersion {}
+impl Backend {
+    async fn bidi_hello(&self, _: ()) -> Result<String> {
+        let version = match self.client.send_request::<ClientVersion>(()).await {
+            Ok(version) => version,
+            Err(err) => {
+                self.client
+                    .log_message(
+                        MessageType::ERROR,
+                        format!("rust: failed to call client for version: {}", err),
+                    )
+                    .await;
+                return Err(jsonrpc::Error::internal_error());
+            }
+        };
+        Ok(format!("hello from rust, client/version: {}", version))
+    }
 
-impl Request for ClientVersion {
-    type Params = ();
-    type Result = String;
-    const METHOD: &'static str = "client/version";
+    async fn bye(&self, _: ()) -> Result<String> {
+        Ok("good bye".to_string())
+    }
 }
 
-enum ServerBidiHello {}
-
-impl Request for ServerBidiHello {
-    type Params = ();
-    type Result = String;
-    const METHOD: &'static str = "server/bidi-hello";
+macro_rules! lsp_request {
+    ($name:ident, $method:literal) => {
+        enum $name {}
+        impl Request for $name {
+            type Params = ();
+            type Result = String;
+            const METHOD: &'static str = $method;
+        }
+    };
 }
 
-enum ServerBye {}
-
-impl Request for ServerBye {
-    type Params = ();
-    type Result = String;
-    const METHOD: &'static str = "server/bye";
-}
+lsp_request!(ClientVersion, "client/version");
+lsp_request!(ServerBidiHello, "server/bidi-hello");
+lsp_request!(ServerBye, "server/bye");
 
 #[tokio::main]
 async fn main() {
@@ -55,27 +68,8 @@ async fn main() {
     let stdout = tokio::io::stdout();
 
     let (service, socket) = LspService::build(|client| Backend { client })
-        .custom_method(ServerBidiHello::METHOD, |backend: &Backend, _: ()| {
-            let client = backend.client.clone();
-            async move {
-                let version = match client.send_request::<ClientVersion>(()).await {
-                    Ok(version) => version,
-                    Err(err) => {
-                        client
-                            .log_message(
-                                MessageType::ERROR,
-                                format!("rust: failed to call client for version: {}", err),
-                            )
-                            .await;
-                        return Err(jsonrpc::Error::internal_error());
-                    }
-                };
-                Ok(format!("hello from rust, client/version: {}", version))
-            }
-        })
-        .custom_method(ServerBye::METHOD, |_backend: &Backend, _: ()| async move {
-            Ok("good bye".to_string())
-        })
+        .custom_method(ServerBidiHello::METHOD, Backend::bidi_hello)
+        .custom_method(ServerBye::METHOD, Backend::bye)
         .finish();
 
     Server::new(stdin, stdout, socket).serve(service).await;
