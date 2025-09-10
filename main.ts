@@ -10,39 +10,17 @@ const connection = rpc.createMessageConnection(
   new rpc.StreamMessageWriter(server.stdin)
 );
 connection.listen();
-// ---- Define request types ----
-// Example: "hello" request (client → server)
-interface HelloParams {
-  processId: number;
-}
-interface HelloResult {
-  capabilities: Record<string, unknown>;
-}
-const HelloRequest = new rpc.RequestType<HelloParams, HelloResult, void>(
-  "hello"
-);
-// Example: "window/showMessage" request (server → client)
-interface ShowMessageParams {
-  type: number;
-  message: string;
-}
-interface ShowMessageResult {
-  acknowledged: boolean;
-}
-const ShowMessageRequest = new rpc.RequestType<
-  ShowMessageParams,
-  ShowMessageResult,
-  void
->("window/showMessage");
 // ---- Client-side logic ----
 // Send "hello" to server
-connection
-  .sendRequest(HelloRequest, { processId: process.pid })
-  .then((result) => {
-    console.log("Server says hello:", result);
-  });
-// Handle "window/showMessage" coming from server
-connection.onRequest(ShowMessageRequest, async (params) => {
-  console.log("Message from server:", params.message);
-  return { acknowledged: true };
+connection.sendRequest("hello", { processId: process.pid }).then((result) => {
+  console.log("Server says hello:", result);
 });
+
+// Handle "window/showMessage" coming from server
+connection.onRequest(
+  "window/showMessage",
+  async (params: { message: string }) => {
+    console.log("Message from server:", params.message);
+    return { acknowledged: true };
+  }
+);
