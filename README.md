@@ -33,7 +33,7 @@ Here is an example of the communication between the TypeScript client and the Go
     ```
     Content-Length: 66\r\n
     \r\n
-    {"jsonrpc":"2.0","id":1,"method":"client/version","params":null}
+    {"jsonrpc":"2.0","id":2,"method":"client/version","params":null}
     ```
 
 3.  **Client -> Server**: The client responds with its version.
@@ -41,7 +41,7 @@ Here is an example of the communication between the TypeScript client and the Go
     ```
     Content-Length: 39\r\n
     \r\n
-    {"jsonrpc":"2.0","id":1,"result":"0.0.1"}
+    {"jsonrpc":"2.0","id":2,"result":"0.0.1"}
     ```
 
 4.  **Server -> Client**: The server receives the client version and responds to the original `server/bidi-hello` request.
