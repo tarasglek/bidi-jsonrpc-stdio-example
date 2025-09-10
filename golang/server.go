@@ -17,7 +17,7 @@ type Server struct{}
 
 
 
-func (s *Server) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
+func (s *Server) hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
 	case "initialize":
 		// Call back into client
@@ -61,7 +61,7 @@ func (stdrwc) Close() error {
 func main() {
 	handler := &Server{}
 	stream := jsonrpc2.NewBufferedStream(new(stdrwc), jsonrpc2.VSCodeObjectCodec{})
-	conn := jsonrpc2.NewConn(context.Background(), stream, jsonrpc2.HandlerWithError(handler.Handle))
+	conn := jsonrpc2.NewConn(context.Background(), stream, jsonrpc2.HandlerWithError(handler.hello))
 	<-conn.DisconnectNotify()
 }
 
