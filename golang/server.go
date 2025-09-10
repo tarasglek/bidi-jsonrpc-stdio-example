@@ -52,12 +52,16 @@ func (stdrwc) Write(p []byte) (int, error) {
 }
 
 func (stdrwc) Close() error {
-	return nil
+	if err := os.Stdin.Close(); err != nil {
+		return err
+	}
+	return os.Stdout.Close()
 }
 
 func main() {
-	stream := jsonrpc2.NewObjectStream(new(stdrwc))
-	conn := jsonrpc2.NewConn(context.Background(), stream, &Server{})
+	handler := &Server{}
+	stream := jsonrpc2.NewObjectStream(new(stdrwc), jsonrpc2.VarintObjectCodec{})
+	conn := jsonrpc2.NewConn(context.Background(), stream, jsonrpc2.HandlerWithError(handler.Handle))
 	<-conn.DisconnectNotify()
 }
 
