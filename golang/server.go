@@ -60,7 +60,7 @@ func (stdrwc) Close() error {
 
 func main() {
 	handler := &Server{}
-	stream := jsonrpc2.NewStream(new(stdrwc), jsonrpc2.VarintObjectCodec{})
+	stream := jsonrpc2.NewBufferedStream(new(stdrwc), jsonrpc2.VarintObjectCodec{})
 	conn := jsonrpc2.NewConn(context.Background(), stream, jsonrpc2.HandlerWithError(handler.Handle))
 	<-conn.DisconnectNotify()
 }
