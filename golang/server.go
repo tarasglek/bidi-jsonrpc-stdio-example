@@ -21,9 +21,9 @@ func (s *Server) hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.R
 				"type":    3,
 				"message": "Hello from Go!",
 			}, &result); err != nil {
-				log.Printf("failed to call client: %v", err)
+				log.Printf("golang: failed to call client: %v", err)
 			} else {
-				log.Printf("client replied: %+v", result)
+				log.Printf("golang: client replied: %+v", result)
 			}
 		}()
 
