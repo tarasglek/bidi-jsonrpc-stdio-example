@@ -32,6 +32,13 @@ type handler struct {
 	s *Server
 }
 
+// Handle processes a single JSON-RPC request. It is essential to run the logic
+// in a separate goroutine to prevent deadlocks. This is because a request
+// handler might need to send a request back to the client and wait for its
+// response. If the handler blocks the main message-reading loop, the server
+// would be unable to process the client's response, leading to a deadlock.
+// By using a goroutine, the main loop remains free to process incoming
+// messages, including responses to requests initiated by the server.
 func (h *handler) Handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) {
 	go func() {
 		result, err := h.s.hello(ctx, conn, req)
