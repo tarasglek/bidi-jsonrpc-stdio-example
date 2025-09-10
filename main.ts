@@ -13,14 +13,11 @@ connection.listen();
 // ---- Client-side logic ----
 // Send "hello" to server
 connection.sendRequest("hello", { processId: process.pid }).then((result) => {
-  console.log("node: Server says hello:", result);
+  console.log("node: Server says:", result);
+  process.exit(0);
 });
 
-// Handle "window/showMessage" coming from server
-connection.onRequest(
-  "window/showMessage",
-  async (params: { message: string }) => {
-    console.log("node: Message from server:", params.message);
-    return { acknowledged: true };
-  }
-);
+// Handle "server/version" request from server
+connection.onRequest("server/version", () => {
+  return "1.0";
+});

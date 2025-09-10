@@ -14,22 +14,14 @@ type Server struct{}
 func (s *Server) hello(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
 	case "hello":
-		// Call back into client
-		go func() {
-			var result map[string]interface{}
-			if err := conn.Call(ctx, "window/showMessage", map[string]interface{}{
-				"type":    3,
-				"message": "Hello from Go!",
-			}, &result); err != nil {
-				log.Printf("golang: failed to call client: %v", err)
-			} else {
-				log.Printf("golang: client replied: %+v", result)
-			}
-		}()
+		var version string
+		if err := conn.Call(ctx, "server/version", nil, &version); err != nil {
+			log.Printf("golang: failed to call client for version: %v", err)
+			return nil, err
+		}
 
-		return map[string]interface{}{
-			"capabilities": map[string]interface{}{},
-		}, nil
+		message := fmt.Sprintf("hello from go, server/version: %s", version)
+		return message, nil
 	default:
 		return nil, &jsonrpc2.Error{Code: jsonrpc2.CodeMethodNotFound, Message: fmt.Sprintf("method not supported: %s", req.Method)}
 	}
