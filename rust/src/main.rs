@@ -55,18 +55,23 @@ async fn main() {
     let stdout = tokio::io::stdout();
 
     let (service, socket) = LspService::build(|client| Backend { client })
-        .custom_method(ServerBidiHello::METHOD, |backend: &Backend, _: ()| async move {
-            let version = match backend.client.send_request::<ClientVersion>(()).await {
-                Ok(version) => version,
-                Err(err) => {
-                    backend
-                        .client
-                        .log_message(MessageType::ERROR, format!("rust: failed to call client for version: {}", err))
-                        .await;
-                    return Err(jsonrpc::Error::internal_error());
-                }
-            };
-            Ok(format!("hello from rust, client/version: {}", version))
+        .custom_method(ServerBidiHello::METHOD, |backend: &Backend, _: ()| {
+            let client = backend.client.clone();
+            async move {
+                let version = match client.send_request::<ClientVersion>(()).await {
+                    Ok(version) => version,
+                    Err(err) => {
+                        client
+                            .log_message(
+                                MessageType::ERROR,
+                                format!("rust: failed to call client for version: {}", err),
+                            )
+                            .await;
+                        return Err(jsonrpc::Error::internal_error());
+                    }
+                };
+                Ok(format!("hello from rust, client/version: {}", version))
+            }
         })
         .custom_method(ServerBye::METHOD, |_backend: &Backend, _: ()| async move {
             Ok("good bye".to_string())
