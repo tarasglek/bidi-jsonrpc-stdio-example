@@ -13,12 +13,21 @@ const connection = rpc.createMessageConnection(
 );
 connection.listen();
 // ---- Client-side logic ----
-// Send "bidi-hello" to server
-connection.sendRequest("server/bidi-hello", { processId: process.pid }).then(async (result) => {
-  console.log("node: Server says:", result);
-  const byeResult = await connection.sendRequest("server/bye");
-  console.log("node: Server says:", byeResult);
-  process.exit(0);
+// Send "initialize" request to server
+connection.sendRequest("initialize", {
+  processId: process.pid,
+  rootUri: null,
+  capabilities: {},
+}).then(() => {
+  connection.sendNotification("initialized", {});
+
+  // Send "bidi-hello" to server
+  connection.sendRequest("server/bidi-hello", null).then(async (result) => {
+    console.log("node: Server says:", result);
+    const byeResult = await connection.sendRequest("server/bye");
+    console.log("node: Server says:", byeResult);
+    process.exit(0);
+  });
 });
 
 // Handle "server/version" request from server
