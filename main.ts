@@ -8,8 +8,8 @@ const cli_args = process.argv.length > 2 ? process.argv.slice(2) : ["golang/gose
 const server = cp.spawn(cli_args[0], cli_args.slice(1), {
   stdio: ["pipe", "pipe", "inherit"], // stdin, stdout, stderr
 });
-let stdout: NodeJS.ReadableStream = server.stdout;
-let stdin: NodeJS.WritableStream = server.stdin;
+let server_stdout: NodeJS.ReadableStream = server.stdout;
+let server_stdin: NodeJS.WritableStream = server.stdin;
 
 if (process.env.DEBUG) {
   const logStream = fs.createWriteStream("debug.log");
@@ -24,17 +24,17 @@ if (process.env.DEBUG) {
     return tee;
   };
 
-  stdout = stdout.pipe(createLoggingTee('< '));
+  server_stdout = server_stdout.pipe(createLoggingTee('< '));
 
   const stdinTee = createLoggingTee('');
-  stdinTee.pipe(stdin);
-  stdin = stdinTee;
+  stdinTee.pipe(server_stdin);
+  server_stdin = stdinTee;
 }
 
 // Setup JSON-RPC connection over stdio
 const connection = rpc.createMessageConnection(
-  new rpc.StreamMessageReader(stdout),
-  new rpc.StreamMessageWriter(stdin)
+  new rpc.StreamMessageReader(server_stdout),
+  new rpc.StreamMessageWriter(server_stdin)
 );
 connection.listen();
 // ---- Client-side logic ----
