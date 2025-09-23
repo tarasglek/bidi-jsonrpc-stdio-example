@@ -13,31 +13,21 @@ let stdin: NodeJS.WritableStream = server.stdin;
 
 if (process.env.DEBUG) {
   const logStream = fs.createWriteStream("debug.log");
+  const createLoggingTee = (prefix: string) => {
+    const tee = new stream.PassThrough();
+    tee.on('data', chunk => {
+      chunk.toString().split(/\r?\n/).forEach((line, i, arr) => {
+        if (i === arr.length - 1 && line === '') return;
+        logStream.write(`${prefix}${line}\n`);
+      });
+    });
+    return tee;
+  };
 
-  const stdoutTee = new stream.PassThrough();
-  stdout.pipe(stdoutTee);
-  stdoutTee.on('data', chunk => {
-    const lines = chunk.toString().split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      if (i === lines.length - 1 && lines[i] === '') {
-        break;
-      }
-      logStream.write(`< ${lines[i]}\n`);
-    }
-  });
-  stdout = stdoutTee;
+  stdout = stdout.pipe(createLoggingTee('< '));
 
-  const stdinTee = new stream.PassThrough();
+  const stdinTee = createLoggingTee('');
   stdinTee.pipe(stdin);
-  stdinTee.on('data', chunk => {
-    const lines = chunk.toString().split(/\r?\n/);
-    for (let i = 0; i < lines.length; i++) {
-      if (i === lines.length - 1 && lines[i] === '') {
-        break;
-      }
-      logStream.write(`${lines[i]}\n`);
-    }
-  });
   stdin = stdinTee;
 }
 
