@@ -48,7 +48,7 @@ connection.sendRequest("initialize", {
   connection.sendNotification("initialized", {});
 
   // Send "bidi-hello" to server
-  connection.sendRequest("server/bidi-hello").then(async (result) => {
+  connection.sendRequest("server/bidi-hello", null).then(async (result) => {
     console.log("node: Server says:", result);
     const byeResult = await connection.sendRequest("server/bye");
     console.log("node: Server says:", byeResult);
