@@ -12,6 +12,10 @@ import (
 
 func rpc(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (result interface{}, err error) {
 	switch req.Method {
+	case "initialize":
+		return nil, nil
+	case "initialized":
+		return nil, nil
 	case "server/bidi-hello":
 		var version string
 		if err := conn.Call(ctx, "client/version", nil, &version); err != nil {
