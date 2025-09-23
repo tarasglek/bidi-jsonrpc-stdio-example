@@ -16,6 +16,8 @@ if (process.env.DEBUG) {
   const createLoggingTee = (prefix: string) => {
     const tee = new stream.PassThrough();
     tee.on('data', chunk => {
+      // HACK: The JSON-RPC messages can be concatenated in a single chunk.
+      // This regex inserts a newline before "Content-Length:" if it's not preceded by one.
       const text = chunk.toString().replace(/(\S)(Content-Length:)/g, '$1\n$2');
       text.split(/\r?\n/).forEach((line, lineIndex, arr) => {
         if (lineIndex === arr.length - 1 && line === '') return;
