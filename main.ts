@@ -17,8 +17,8 @@ if (process.env.DEBUG) {
     const tee = new stream.PassThrough();
     tee.on('data', chunk => {
       // HACK: The JSON-RPC messages can be concatenated in a single chunk.
-      // This regex inserts a newline before "Content-Length:" if it's not preceded by one.
-      const text = chunk.toString().replace(/(\S)(Content-Length:)/g, '$1\n$2');
+      // This regex inserts a newline before "Content-Length:" if it's preceded by a "}".
+      const text = chunk.toString().replace(/(})(Content-Length:)/g, '$1\n$2');
       text.split(/\r?\n/).forEach((line, lineIndex, arr) => {
         if (lineIndex === arr.length - 1 && line === '') return;
         logStream.write(`${prefix}${line}\n`);
@@ -50,7 +50,7 @@ connection.sendRequest("initialize", {
   connection.sendNotification("initialized", {});
 
   // Send "bidi-hello" to server
-  connection.sendRequest("server/bidi-hello", null).then(async (result) => {
+  connection.sendRequest("server/bidi-hello").then(async (result) => {
     console.log("node: Server says:", result);
     const byeResult = await connection.sendRequest("server/bye");
     console.log("node: Server says:", byeResult);
