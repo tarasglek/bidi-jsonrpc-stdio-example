@@ -1,7 +1,9 @@
 import * as cp from "child_process";
 import * as rpc from "vscode-jsonrpc/node";
-// Launch the Go server process
-const server = cp.spawn("./golang/goserver", [], {
+
+const cli_args = process.argv.length > 2 ? process.argv.slice(2) : ["golang/goserver"];
+// Launch the server process
+const server = cp.spawn(cli_args[0], cli_args.slice(1), {
   stdio: ["pipe", "pipe", "inherit"], // stdin, stdout, stderr
 });
 // Setup JSON-RPC connection over stdio
