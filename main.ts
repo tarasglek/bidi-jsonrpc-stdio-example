@@ -41,22 +41,23 @@ const connection = rpc.createMessageConnection(
 );
 connection.listen();
 // ---- Client-side logic ----
-// Send "initialize" request to server
-connection.sendRequest("initialize", {
-  processId: process.pid,
-  rootUri: null,
-  capabilities: {},
-}).then(() => {
+async function main() {
+  // Send "initialize" request to server
+  await connection.sendRequest("initialize", {
+    processId: process.pid,
+    rootUri: null,
+    capabilities: {},
+  });
   connection.sendNotification("initialized", {});
 
   // Send "bidi-hello" to server
-  connection.sendRequest("server/bidi-hello").then(async (result) => {
-    console.log("node: Server says:", result);
-    const byeResult = await connection.sendRequest("server/bye");
-    console.log("node: Server says:", byeResult);
-    process.exit(0);
-  });
-});
+  const result = await connection.sendRequest("server/bidi-hello");
+  console.log("node: Server says:", result);
+  const byeResult = await connection.sendRequest("server/bye");
+  console.log("node: Server says:", byeResult);
+  process.exit(0);
+}
+main();
 
 // Handle "server/version" request from server
 connection.onRequest("client/version", () => {
