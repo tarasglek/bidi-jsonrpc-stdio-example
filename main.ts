@@ -16,12 +16,28 @@ if (process.env.DEBUG) {
 
   const stdoutTee = new stream.PassThrough();
   stdout.pipe(stdoutTee);
-  stdoutTee.on('data', chunk => logStream.write(`[stdout] ${chunk.toString()}`));
+  stdoutTee.on('data', chunk => {
+    const lines = chunk.toString().split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      if (i === lines.length - 1 && lines[i] === '') {
+        break;
+      }
+      logStream.write(`[stdout] ${lines[i]}\n`);
+    }
+  });
   stdout = stdoutTee;
 
   const stdinTee = new stream.PassThrough();
   stdinTee.pipe(stdin);
-  stdinTee.on('data', chunk => logStream.write(`[stdin] ${chunk.toString()}`));
+  stdinTee.on('data', chunk => {
+    const lines = chunk.toString().split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      if (i === lines.length - 1 && lines[i] === '') {
+        break;
+      }
+      logStream.write(`[stdin] ${lines[i]}\n`);
+    }
+  });
   stdin = stdinTee;
 }
 
