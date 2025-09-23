@@ -26,7 +26,7 @@ impl LanguageServer for Backend {
 }
 
 impl Backend {
-    async fn bidi_hello(&self, _: ()) -> Result<String> {
+    async fn bidi_hello(&self) -> Result<String> {
         let version = match self.client.send_request::<ClientVersion>(()).await {
             Ok(version) => version,
             Err(err) => {
@@ -42,7 +42,7 @@ impl Backend {
         Ok(format!("hello from rust, client/version: {}", version))
     }
 
-    async fn bye(&self, _: ()) -> Result<String> {
+    async fn bye(&self) -> Result<String> {
         Ok("good bye".to_string())
     }
 }

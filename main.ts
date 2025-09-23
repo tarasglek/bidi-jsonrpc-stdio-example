@@ -44,11 +44,11 @@ connection.listen();
 async function main() {
   // Send "initialize" request to server
   await connection.sendRequest("initialize", {
-    processId: process.pid,
-    rootUri: null,
+    // processId: process.pid,
+    // rootUri: null,
     capabilities: {},
   });
-  connection.sendNotification("initialized", {});
+  // await connection.sendNotification("initialized", {});
 
   // Send "bidi-hello" to server
   const result = await connection.sendRequest("server/bidi-hello");
