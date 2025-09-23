@@ -16,8 +16,8 @@ if (process.env.DEBUG) {
   const createLoggingTee = (prefix: string) => {
     const tee = new stream.PassThrough();
     tee.on('data', chunk => {
-      chunk.toString().split(/\r?\n/).forEach((line, i, arr) => {
-        if (i === arr.length - 1 && line === '') return;
+      chunk.toString().split(/\r?\n/).forEach((line, lineIndex, arr) => {
+        if (lineIndex === arr.length - 1 && line === '') return;
         logStream.write(`${prefix}${line}\n`);
       });
     });
