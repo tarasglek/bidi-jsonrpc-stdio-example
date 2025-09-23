@@ -22,7 +22,7 @@ if (process.env.DEBUG) {
       if (i === lines.length - 1 && lines[i] === '') {
         break;
       }
-      logStream.write(`[stdout] ${lines[i]}\n`);
+      logStream.write(`< ${lines[i]}\n`);
     }
   });
   stdout = stdoutTee;
@@ -35,7 +35,7 @@ if (process.env.DEBUG) {
       if (i === lines.length - 1 && lines[i] === '') {
         break;
       }
-      logStream.write(`[stdin] ${lines[i]}\n`);
+      logStream.write(`${lines[i]}\n`);
     }
   });
   stdin = stdinTee;
